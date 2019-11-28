@@ -1,1 +1,66 @@
+## Installation instructions of container-runtimes
 
+ - To run containers in Pods, Kubernetes uses a container runtime.
+
+ - instructions with sudo + commands or change to rout and then run commands
+
+# Cgroup drivers
+  root control group(cgroup)
+  cgroup manager
+  Systemd
+  cgroupfs
+  
+  Control groups are used to constrain resources that are allocated to processes.
+  
+  A single cgroup manager can view what resources are being allocated and view the available and in-use resources by default.
+  
+  native.cgroupdriver=systemd //Please note the native.cgroupdriver=systemd option in the Docker setup below.
+  
+# Install Docker runtime
+On each of your machines, install Docker. Recommended version 18.06.2
+  - Install Docker on your system
+
+      -----------------------------------------------------------------
+      # Install Docker CE
+      ## Set up the repository:
+      ### Install packages to allow apt to use a repository over HTTPS
+      sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+
+      ### Add Docker’s official GPG key
+      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+      ### Add Docker apt repository.
+      sudo add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable"
+
+      ## Install Docker CE.
+      sudo apt-get update && sudo apt-get install docker-ce=18.06.2~ce~3-0~ubuntu -y
+
+      # Setup daemon.
+      sudo vim /etc/docker/daemon.json
+        # input the following 
+        ================================================
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"],
+          "log-driver": "json-file",
+          "log-opts": {
+            "max-size": "100m"
+          },
+          "storage-driver": "overlay2"
+        }
+        ================================================
+
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+
+      # Restart docker.
+      sudo systemctl daemon-reload
+      sudo systemctl restart docker
+      -----------------------------------------------------------------
+  
+  
+  # About other container runtimes such as CRI , frakti, containerd, CRI-O runtimes, Please look the page:
+    https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+  
+  
