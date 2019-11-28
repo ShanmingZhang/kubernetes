@@ -1,10 +1,8 @@
 ## Installation instructions of container-runtimes
 
- - To run containers in Pods, Kubernetes uses a container runtime.
+ - To run containers in Pods, Kubernetes uses a container runtime, such as Docker.
 
- - instructions with sudo + commands or change to rout and then run commands
-
-# Cgroup drivers
+# Cgroup drivers 
   root control group(cgroup)
   cgroup manager
   Systemd
@@ -16,8 +14,8 @@
   
   native.cgroupdriver=systemd //Please note the native.cgroupdriver=systemd option in the Docker setup below.
   
-# Install Docker runtime
-On each of your machines, install Docker. Recommended version 18.06.2
+## Install Docker runtime
+On each of your machines (only work node?), install Docker. Recommended version 18.06.2
   - Install Docker on your system
 
       -----------------------------------------------------------------
