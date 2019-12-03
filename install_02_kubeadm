@@ -1,1 +1,22 @@
-#Install kubeadmin
+#Install kubeadm, kubelet, and kubectl
+  - kubeadm : the command to bootstrap the cluster
+  - kubelet : the commponent that runs on all of the machines in your cluster and does things like starting pods and containers
+  - kubectl : the command line util to talk to your cluster
+  - version issues:
+  - kubeadm will not install or manage kubelet or kubectl, need to ensure their versions
+  - After installing, kubelet will restart every few seconds to waits in a crashloop for kubeadm to tell it what to do.
+  
+  ------------------------------------------------------------------------------------
+  sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  sudo vim /etc/apt/sources.list.d/kubernetes.list
+      iput the following:
+      -----------------------------------------------------------
+      deb https://apt.kubernetes.io/ kubernetes-xenial main
+      -----------------------------------------------------------
+ 
+  sudo apt-get update
+  sudo apt-get install -y kubelet kubeadm kubectl
+  sudo apt-mark hold kubelet kubeadm kubectl
+  ------------------------------------------------------------------------------------
+
