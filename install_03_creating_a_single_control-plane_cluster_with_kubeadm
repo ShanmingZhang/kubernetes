@@ -1,0 +1,86 @@
+# Create a single control-plane cluster
+  - Kubeadm helps you bootstrap a minimum viable kubernetes cluster that confroms to best practices.
+  - Kubeadm can be installed on various types of machines
+  - Kubeadm can serve:
+     - New users can start with kubeadm to try Kubernetes out for the first time.
+     - Users familiar with Kubernetes can spin up clusters with kubeadm and test their applications.
+     - Larger projects can include kubeadm as a building block in a more complex system that can also include other installer tools.
+1. Installing kubeadm on your hosts (control plane node)
+
+2. Initializing control plane node  (operations of control plan node (master node) )
+     - The control-plane node is the machine where the control plane components run, 
+       including etcd(the cluster database) and the API server (which the kubectl CLL communications with)
+     - '--control-plane-endpoint': set the shared endpoint for all control-plane nodes.
+        control-plane can include one kubeadm node, and also include a control-plane kubeadm cluster(multiple kubeadm nodes)
+     
+     ---------------------------------------
+     sudo kubeadm init --v=5
+     or 
+     // if kubernetes pod networks has been installed.
+     sudo kubeadm init --apiserver-advertise-address=192.168.2.51 --pod-network-cidr=10.244.0.0/16 
+     ---------------------------------------
+         the last outputs
+           ====
+            [addons] Applied essential addon: CoreDNS
+            [addons] Applied essential addon: kube-proxy
+
+            Your Kubernetes control-plane has initialized successfully!
+
+            To start using your cluster, you need to run the following as a regular user:
+
+              mkdir -p $HOME/.kube
+              sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+              sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+            You should now deploy a pod network to the cluster.
+            Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+              https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+            Then you can join any number of worker nodes by running the following on each as root:
+
+            kubeadm join 192.168.2.51:6443 --token 0n3sou.91dd426xjxmtaguj \
+                --discovery-token-ca-cert-hash sha256:24595457885f961fb77ba5e0daf90330595abf8599575a423b77691239323551
+           ====
+       - To start using your cluster    
+         mkdir -p $HOME/.kube
+         sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+         sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      ---------------------------------------
+      *if caused swap error, then perform the following command fistly
+        sudo swapoff -a // close the memerory
+      *The token is used for mutual authentication between the control-plane node and the joining nodes
+
+3. Installing a Kubernetes Pod Network add-on (operations of control plan node (master node) )
+     - Must install a Kubernetes Pod Network add-on so that your pods can communicate with each other.
+     - The network(Kubernetes Pod Network) must be deployed before any applications
+     - CoreDNS will not start up before a network is installed
+     - Kubeadm only supports Container Network Interface (CNI) based networks (and does not support kubenet)
+     - Pod network must not overlap with any of the host networks as this can cause issues.
+          -a suitable CIDR replacement and use that during kubeadm init with --pod-network-cidr and as a replacement in your network plugin’s YAML.
+     
+     - Install a pod network add-on with the following command on the control-plane node or a node that has the kubeconfig credentials
+        kubectl apply -f <add-on.yaml>
+        
+     - Install only one pod network per cluster
+     
+        * kube-router: https://github.com/cloudnativelabs/kube-router/blob/master/docs/kubeadm.md
+                       
+                     - Kube-router relies on kube-controller-manager to allocate pod CIDR for the nodes.
+                     - Kube-router provides pod networking, network policy, and high-performing IP Virtual Server(IPVS)/Linux Virtual Server(LVS) based service proxy.
+        1). kube-router providing service proxy, firewall and pod networking.
+          --------
+          sudo sysctl net.bridge.bridge-nf-call-iptables=1
+          sudo kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter-all-features.yaml
+        
+        2). sudo kubeadm reset    // existing cluster clear/remove
+          sudo kubeadm init --pod-network-cidr=10.10.0.0/16 // kubeadm cluster init
+          or
+          sudo kubeadm init --apiserver-advertise-address=192.168.2.51 --pod-network-cidr=10.244.0.0/16 // kubeadm cluster init
+          
+4. Joining work nodes (operations of work node host )
+     
+     
+     
+     
+     
+     
