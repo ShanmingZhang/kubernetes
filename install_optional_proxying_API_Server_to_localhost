@@ -1,1 +1,33 @@
 # Optional
+# config to connect to the API Server from outside cluster 
+  - Using 'kubectl proxy' command on other remote node that outside cluster and support kubectl.
+
+1. Make a machine can talk with cluster, firstly to get administrator kubeconfig file from control-plane node to the machine.
+    * copy the administrator kubeconfig file from control-plane node
+      -------
+      scp root@<control-plane-host>:/etc/kubernetes/admin.conf .  // from remote machine
+      or
+      scp /etc/kubernetes/admin.conf <account>@<remote_machine_ip>:/home/<account>  // from control-plane node 
+      -------
+    * directly perform kubectl with option --kubeconfig 
+       for example:
+      -------
+      sudo kubectl --kubeconfig ./admin.conf get nodes
+      -------
+    * also we can config the kubeconfig file for use easily. change to next #2
+    
+   **** Config the administrator kubeconfig file in remote machine
+        ---------
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        ---------
+        then, we can use the following commands to confirm the configration.
+        ----------
+        sudo kubectl get nodes
+        ----------
+ 2. proxy API server to localhost
+    -----
+    sudo kubectl proxy
+    -----
