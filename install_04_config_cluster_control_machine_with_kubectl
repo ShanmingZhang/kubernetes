@@ -1,1 +1,29 @@
-# Controlling cluster from other machines other than control-plane node.
+# config remote machine for controlling cluster other than control-plane node.
+- cluster can be controlled directly from control-plane node.
+- cluster can also be controlled from other node that is configed with kubectl.
+
+1. Make a machine can talk with cluster, firstly to get administrator kubeconfig file from control-plane node to the machine.
+    * copy the administrator kubeconfig file from control-plane node
+      -------
+      scp root@<control-plane-host>:/etc/kubernetes/admin.conf .  // from remote machine
+      or
+      scp /etc/kubernetes/admin.conf <account>@<remote_machine_ip>:/home/<account>  // from control-plane node 
+      -------
+    * directly perform kubectl with option --kubeconfig 
+       for example:
+      -------
+      sudo kubectl --kubeconfig ./admin.conf get nodes
+      -------
+    * also we can config the kubeconfig file for use easily. change to next #2
+    
+**** Config the administrator kubeconfig file in remote machine
+        ---------
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        ---------
+        then, we can use the following commands to confirm the configration.
+        ----------
+        sudo kubectl get nodes
+        ----------
