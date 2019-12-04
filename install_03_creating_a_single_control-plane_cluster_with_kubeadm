@@ -76,11 +76,35 @@
           sudo kubeadm init --pod-network-cidr=10.10.0.0/16 // kubeadm cluster init
           or
           sudo kubeadm init --apiserver-advertise-address=192.168.2.51 --pod-network-cidr=10.244.0.0/16 // kubeadm cluster init
-          
+         
 4. Joining work nodes (operations of work node host )
-     
-     
-     
-     
-     
+   4-1. isolation or non-isolation pods and control-plane node
+        - isolation:  By default the pods of work nodes for workload and control-plane node (master node) is isolated for security reasons.
+        - non-isolation: the pods and control-plane node can also be not isolated they are on the same node
+                        such as, a single-machine Kubernetes cluster for development that pods of work nodes and control-plane node are on the machine node
+                        we can run the following command for non-isolation model.
+                        ========
+                        kubectl taint nodes --all node-role.kubernetes.io/master-
+                        ========
+   4-2. join work nodes
+         - nodes in which workload (container and pods) are run
+         - add new nodes to cluster
+            * SSH to the machine
+            * Root or sudo su -
+            * Run the output command ouputed by kubeadm init
+                ------
+                kubeadm join 192.168.2.51:6443 --token 0n3sou.91dd426xjxmtaguj \
+                --discovery-token-ca-cert-hash sha256:24595457885f961fb77ba5e0daf90330595abf8599575a423b77691239323551
+                ------    
+                **  token
+                    - can run 'kubeadm token list' command on control-plane node to confirm current token
+                    - token expire after 24 hours.
+                    - can create new token by running 'kubeadm token create'
+                **  discovery-token-ca-cert-hash
+                    - get value of discovery-token-ca-cert-hash by running the following command:
+                       ------
+                       openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
+                               openssl dgst -sha256 -hex | sed 's/^.* //'
+                       ------
+                       
      
