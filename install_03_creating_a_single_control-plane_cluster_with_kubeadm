@@ -93,7 +93,7 @@
             * Root or sudo su -
             * Run the output command ouputed by kubeadm init
                 ------
-                kubeadm join 192.168.2.51:6443 --token 0n3sou.91dd426xjxmtaguj \
+                sudo kubeadm join 192.168.2.51:6443 --token 0n3sou.91dd426xjxmtaguj \
                 --discovery-token-ca-cert-hash sha256:24595457885f961fb77ba5e0daf90330595abf8599575a423b77691239323551
                 ------
                 **  if caused swap error, then perform the following command fistly
