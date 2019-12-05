@@ -1,0 +1,22 @@
+# tear down (remove) a cluster what it undo
+  * the flow of tear down a cluster
+    - first drain the node and make sure that the node is empty
+    - second shut the node down
+    - third reset the kubeadm
+  * more details: 
+    https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+    https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-reset/
+    
+1. firstly talk to the control-plane node with the appropriate credentials, and drain the node
+   --
+   kubectl drain <node name> --delete-local-data --force --ignore-daemonsets
+   --
+2. Secondly shut down(delete) the node 
+   ---
+   kubectl delete node <node name>
+   ---
+3. Thirdly on the node being removed, reset all kubeadm installed state:
+   ---
+   kubeadm reset
+ 
+   
