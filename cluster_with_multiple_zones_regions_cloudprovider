@@ -1,0 +1,30 @@
+# a cluster can cover multiple zones whose maybe belong to different regions, different cloud providers
+
+# patern of multiple zones,multiple regions,multiple, cloud providers for a single cluster
+   - ideal patern
+                            
+                           control-plane nodes
+                                   |
+                                   |
+ ------------------------------------------------------------------------
+            |                      |                       |
+            |                      |                       |
+     cloud provider#1       cloud provider#1         cloud provider#n
+            |                      |                       |
+            |                      |                       |
+     ---------------        ----------------         --------------
+        |       |             |          |             |         | 
+        |       |             |          |             |         |
+    region#1  region#n     region#1  region#n        region#1  region#n
+        |       |             |          |             |         |
+        |       |             |          |             |         |
+      ------  ------        ------     ------        ------    ------
+      |    |  |    |        |     |    |    |        |    |    |     |
+      |    |  |    |        |     |    |    |        |    |    |     | 
+    Zone#1........Zone#n  Zone#1 .........Zone#n  Zone#1...........Zone#n
+
+
+# limitations of practical multizone cluster
+   - a single Kubernetes cluster can run in multiple multiple zones
+   - but only within the same region and cloud provider
+   
