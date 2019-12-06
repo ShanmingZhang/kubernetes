@@ -25,6 +25,19 @@
 
 
 # limitations of practical multizone cluster
-   - a single Kubernetes cluster can run in multiple multiple zones
-   - but only within the same region and cloud provider
+   * the best is a single Kubernetes cluster can run in multiple  zones but only within the same region and cloud provider
+   a) differnet zone and different provider with different network, that can increase the traffic latency and cost
+   b) Volume zone-affinity only work with PersistentVolum, and not work to directly specify and EBS volume in the pod spec 
+   c) Cluster cannot span clouds or regions
+   d) By default, only build a single master node for a multiple zones cluster. need to realize a highly available control plane by other approches.
    
+
+* Label of node zone information be add by kubelet automotically when nodes are started, and send to control-plane.
+* Kubernetes spread/allocate the pods in a replication controller or service across nodes in a single-zone cluster
+
+# The spreading/allocate behavior is extended across zones with mutiple-zone cluster
+     - heterogeneous zones: different numbers of nodes, different types of nodes, different pod resource requirments
+         * cause to allocate the pods between different area unequal.
+     - homogeneous zones: same number and types of nodes
+         * reduce the probability of unequal spreading (allocation)
+         
