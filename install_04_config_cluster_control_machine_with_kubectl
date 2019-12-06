@@ -1,3 +1,4 @@
+# Optional
 # config remote machine for controlling cluster other than control-plane node.
 - cluster can be controlled directly from control-plane node.
 - cluster can also be controlled from other node that is configed with kubectl.
