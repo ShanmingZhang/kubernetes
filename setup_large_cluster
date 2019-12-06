@@ -1,0 +1,81 @@
+# Building large cluster
+
+  - Kubernetes v1.16
+     * No more than 5000 nodes
+     * No more than 150000 total pods
+     * No more than 300000 total containers
+     * No more than 100 pods per node
+
+# Setup 
+   * A cluster is a set of nodes (physical or virtual machines) that run Kubernetes agents, managed by a control-plane.
+   * The number of nodes in a cluster can be configured in the platform-specific file 'config-default.sh'
+   * The parameter name is NUM_NODES, its value is the number of nodes
+   * The value of NUM_NODES can be easily changed to very large
+   * The large value of NUM_NODES can also cause the fail for many cloud providers
+   
+   - The following issues must be considered:
+      * Quota Issues
+      * Etcd storage
+      * Size of master and master components
+      * Add on Resources
+      * Allowing minor node failure at startup
+      
+
+
+# Quota issues
+  - in order to avoid running into cloud provider quota issues, must consider:
+    * Increase the quota for things:
+        CPUs
+        VM instances
+        Total persistent disk reserved
+        In-use IP addresses
+        Firewall Rules
+        Forwarding rules
+        Routes
+        Target pools
+    * Gating the setup script so that it brings up new node VMs in smaller batches with waits in between, because some cloud providers rate limit the creation of VMs.
+      (consider the worknode creation and creation time and  distribution)
+
+
+# Etcd storage (multiple ectd instance)
+  - store events in a separate dedicated etc instance ( two etc instance ?) in order to imporve performance of large clusters.
+  - the preduce of creating a cluster:
+     * start and configure additional etcd instance   ( second etcd instance ) 
+     * configure api-server to use it for storing events
+
+# Size of master (spec of master)
+  - The vm size of master node depending on the number of nodes in your cluster
+  - The vm size of master node also configure it manually
+
+# Addon (eg, fluentd,) Resources
+  - Kubernetes sets resource limits on addon containers to limit the CPU and Memory resource consumption of addons
+    in order to prevent memory leaks or other resource issues caused by cluster addons that maybe consume all the resources available of a node
+      -------------------------------------------------
+      containers:
+      - name: fluentd-cloud-logging
+        image: k8s.gcr.io/fluentd-gcp:1.16
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+      -------------------------------------------------
+      ** but these limits are static and based on data
+      ** addons consume a lot more resources when runing on large deployment cluster with large data workload.
+      ** When a large cluster is deployed without adjusting these values, the addons may continuously get killed
+         because they keep hitting the limits.
+   
+   - must consider the followings when creating a cluster to avoid running into cluster addon resource issues.
+      * Scale memory and CPU limits for addons :  influxdb, grafana, kubedns, dnsmasq, sidecar, kibana
+      * Scale number of replicas for  addons : elasticsearch
+      * Increase memory and CPU limits slightly for each of the following addons : fluentd
+      
+      
+      
+ # Allowing minor node failure at startup
+   - running kube-up.sh with a very large NUM_NODES may fail due to a very small number of nodes coming up properly.
+   - two choices to solve the issue:
+      * restart the cluster : kube-down.sh and then kube-up.sh
+      * set the environment variable ALLOWED_NOTREADY_NODES to whatever value you feel comfortable with before running kube-up.sh
+          ** this will allow kube-up.sh to succeed with fewer than NUM_NODES coming up
+          ** Those additional nodes may join later or the cluster may remain at a size of (NUM_NODES - ALLOWED_NOTREADY_NODES)
+            
